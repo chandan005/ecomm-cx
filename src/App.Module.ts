@@ -4,9 +4,17 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { AppController } from './App.Controller';
 import { AppConfigModule } from './config/AppConfig.Module';
+import { CoreModule } from './core/.Core.Module';
+import { InfraModule } from './infra/.Infra.Module';
 
 @Module({
-  imports: [AppConfigModule, ThrottlerModule.forRoot(), EventEmitterModule.forRoot()],
+  imports: [
+    AppConfigModule,
+    ThrottlerModule.forRoot(),
+    EventEmitterModule.forRoot(),
+    CoreModule,
+    InfraModule,
+  ],
   controllers: [AppController],
   providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
 })

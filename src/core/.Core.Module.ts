@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
 
+import { DocumentModule } from './documents/Document.Module';
+
 @Module({
-  imports: [],
+  imports: [DocumentModule],
 })
 export class CoreModule {}
