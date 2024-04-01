@@ -1,7 +1,9 @@
+/* eslint-disable import/order */
 import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { S3 } from 'aws-sdk';
+import { Readable } from 'stream';
 import { PresignedUrlType } from './entities/PresignedUrlType';
 
 @Injectable()
@@ -23,7 +25,6 @@ export class S3Service {
     bucket: string,
     key: string,
     operationType: PresignedUrlType,
-    contentType: string,
     expirationTimeInSeconds?: number | undefined,
   ): Promise<string> {
     try {
@@ -37,30 +38,28 @@ export class S3Service {
     }
   }
 
-  async uploadToS3(key: string, data: Buffer): Promise<void> {
+  async uploadToS3(bucket: string, key: string, data: Buffer): Promise<void> {
     try {
       const uploadParams: S3.PutObjectRequest = {
-        Bucket: process.env.S3_BUCKET_NAME || '',
+        Bucket: bucket,
         Key: key,
         Body: data,
       };
       await this.s3.upload(uploadParams).promise();
-    } catch (err) {}
+    } catch (err) {
+      console.error(err);
+    }
   }
 
-  //   async uploadToS3(signedUrl: string, contentType: string, data: any): Promise<AxiosResponse> {
-  //     try {
-  //       const response = await firstValueFrom(
-  //         this.httpService.put(signedUrl, data, {
-  //           headers: {
-  //             'Content-Type': contentType,
-  //             'Content-Disposition': 'inline',
-  //           },
-  //         }),
-  //       );
-  //       return response;
-  //     } catch (err) {
-  //       throw new Error(err);
-  //     }
-  //   }
+  async getCsvStream(bucket: string, key: string): Promise<Readable | undefined> {
+    const params = {
+      Bucket: bucket,
+      Key: key,
+    };
+    try {
+      return this.s3.getObject(params).createReadStream();
+    } catch (err) {
+      console.error(err);
+    }
+  }
 }

@@ -19,11 +19,7 @@ export class Document extends BaseEntity {
 
   @ApiProperty()
   @Column({ type: 'varchar', nullable: false })
-  url: string;
-
-  @ApiProperty()
-  @Column({ type: 'varchar', nullable: true })
-  fileName?: string;
+  fileName: string;
 
   @ApiProperty()
   @Column({ type: 'varchar', nullable: true, default: DocumentType.CsvMessage })
