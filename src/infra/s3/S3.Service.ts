@@ -2,8 +2,6 @@ import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { S3 } from 'aws-sdk';
-import { AxiosResponse } from 'axios';
-import { firstValueFrom } from 'rxjs';
 import { PresignedUrlType } from './entities/PresignedUrlType';
 
 @Injectable()
@@ -33,26 +31,36 @@ export class S3Service {
         Key: key,
         Bucket: bucket,
         Expires: expirationTimeInSeconds,
-        Conditions: [{ 'Content-Type': `${contentType}` }],
       });
     } catch (err) {
       throw new Error(err);
     }
   }
 
-  async uploadToS3(signedUrl: string, contentType: string, data: any): Promise<AxiosResponse> {
+  async uploadToS3(key: string, data: Buffer): Promise<void> {
     try {
-      const response = await firstValueFrom(
-        this.httpService.put(signedUrl, data, {
-          headers: {
-            'Content-Type': contentType,
-            'Content-Disposition': 'inline',
-          },
-        }),
-      );
-      return response;
-    } catch (err) {
-      throw new Error(err);
-    }
+      const uploadParams: S3.PutObjectRequest = {
+        Bucket: process.env.S3_BUCKET_NAME || '',
+        Key: key,
+        Body: data,
+      };
+      await this.s3.upload(uploadParams).promise();
+    } catch (err) {}
   }
+
+  //   async uploadToS3(signedUrl: string, contentType: string, data: any): Promise<AxiosResponse> {
+  //     try {
+  //       const response = await firstValueFrom(
+  //         this.httpService.put(signedUrl, data, {
+  //           headers: {
+  //             'Content-Type': contentType,
+  //             'Content-Disposition': 'inline',
+  //           },
+  //         }),
+  //       );
+  //       return response;
+  //     } catch (err) {
+  //       throw new Error(err);
+  //     }
+  //   }
 }

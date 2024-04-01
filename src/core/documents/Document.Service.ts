@@ -1,4 +1,4 @@
-/* eslint-disable import/order */
+import { extname } from 'path';
 import {
   BadGatewayException,
   BadRequestException,
@@ -7,9 +7,7 @@ import {
 } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { S3Service } from '../../infra/s3/S3.Service';
-
 import { Nullable } from '../../lib/types/Nullable';
-
 import { DocumentRepository } from './Document.Repository';
 
 import { CreateDocumentDto } from './dto/CreateDocumentDto';
@@ -54,6 +52,23 @@ export class DocumentService {
     }
   }
 
+  async upload(file: Express.Multer.File): Promise<void> {
+    try {
+      if (!file) {
+        throw new BadRequestException('No file uploaded');
+      }
+
+      const ext = extname(file.originalname).toLowerCase();
+      if (ext !== '.csv') {
+        throw new BadRequestException('Only CSV files are allowed');
+      }
+
+      await this.s3Service.uploadToS3(file.originalname, file.buffer);
+    } catch (err) {
+      throw new BadRequestException(err.message || 'Failed to upload CSV');
+    }
+  }
+
   /**
    *
    * @param getPresignedUrlForCompanyDto
@@ -86,6 +101,7 @@ export class DocumentService {
       };
       return signedUrlResponse;
     } catch (err) {
+      console.error(err);
       throw new BadRequestException(
         `Error generating signed url for fileName ${getPresignedUrlDto.fileName}`,
       );

@@ -6,7 +6,7 @@ import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 export class AppController {
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse()
-  @Get()
+  @Get('/health/v1')
   health(): void {
     return;
   }

@@ -3,11 +3,12 @@ import {
   ClassSerializerInterceptor,
   Controller,
   Post,
+  UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { DocumentService } from './Document.Service';
-import { CreateDocumentDto } from './dto/CreateDocumentDto';
 import { GetPresignedUrlDto } from './dto/GetPresignedUrlDto';
 import { SignedUrlResponseDto } from './dto/SignedUrlResponseDto';
 import { Document } from './entities/Document.Entity';
@@ -18,14 +19,13 @@ import { Document } from './entities/Document.Entity';
 export class DocumentController {
   constructor(private readonly documentService: DocumentService) {}
 
-  @ApiBearerAuth()
   @ApiResponse({ type: Document })
-  @Post('')
-  create(@Body() createDocumentDto: CreateDocumentDto) {
-    return this.documentService.create(createDocumentDto);
+  @UseInterceptors(FileInterceptor('csv'))
+  @Post('upload')
+  upload(@UploadedFile() file: Express.Multer.File) {
+    return this.documentService.upload(file);
   }
 
-  @ApiBearerAuth()
   @ApiResponse({ type: SignedUrlResponseDto })
   @Post('generate-presigned-url')
   generatePresignedUrl(@Body() getPresignedUrlDto: GetPresignedUrlDto) {
