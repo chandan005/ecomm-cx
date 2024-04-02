@@ -26,8 +26,13 @@ export class IntentRepository {
     return this.repository.createQueryBuilder('si').where('si.id = :id', { id }).getOne();
   }
 
-  async findSystemIntents(): Promise<Nullable<SystemIntent[]>> {
-    return this.repository.createQueryBuilder('si').getMany();
+  async findByIntent(options: { intent?: string }): Promise<Nullable<SystemIntent>> {
+    const queryBuilder = this.repository.createQueryBuilder('si');
+
+    if (options.intent) {
+      queryBuilder.andWhere('si.intent = :intent', { intent: options.intent });
+    }
+    return this.repository.createQueryBuilder('si').getOne();
   }
 
   async findSeededSystemIntentsCount(): Promise<number> {

@@ -11,11 +11,13 @@ import { extname } from 'path';
 import { S3Service } from '../../infra/s3/S3.Service';
 import { Nullable } from '../../lib/types/Nullable';
 import { DocumentRepository } from './Document.Repository';
+import { DOCUMENT_UPLOADED } from './DocumentEventListener.Service';
 import { CreateDocumentDto } from './dto/CreateDocumentDto';
 import { GetPresignedUrlDto } from './dto/GetPresignedUrlDto';
 import { SignedUrlResponseDto } from './dto/SignedUrlResponseDto';
-import { ChatbotMessage } from './entities/ChatbotMessage.Type';
+import { CsvMessage } from './entities/CsvMessage.Type';
 import { Document } from './entities/Document.Entity';
+import { DocumentType } from './entities/DocumentType.Enum';
 
 @Injectable()
 export class DocumentService {
@@ -34,6 +36,11 @@ export class DocumentService {
       if (!document) {
         throw new BadRequestException(`Exception creating document.`);
       }
+
+      if (document.documentType === DocumentType.CsvMessage) {
+        this.eventEmitter.emitAsync(DOCUMENT_UPLOADED, document);
+      }
+
       return document;
     } catch (err) {
       console.log(err);
@@ -110,8 +117,8 @@ export class DocumentService {
     }
   }
 
-  async validateCsv(bucket: string, key: string): Promise<ChatbotMessage[]> {
-    const chatbotMessages: ChatbotMessage[] = [];
+  async validateCsv(bucket: string, key: string): Promise<CsvMessage[]> {
+    const chatbotMessages: CsvMessage[] = [];
     const readableStream = await this.s3Service.getCsvStream(bucket, key);
 
     if (!readableStream) {
@@ -140,7 +147,7 @@ export class DocumentService {
         break;
       }
 
-      const chatbotMessage: ChatbotMessage = {
+      const chatbotMessage: CsvMessage = {
         senderUserName: record.sender_username,
         receiverUserName: record.receiver_username,
         message: record.message,

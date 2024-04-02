@@ -15,8 +15,8 @@ export class IntentService {
   constructor(private readonly intentRepository: IntentRepository) {}
 
   async onModuleInit() {
-    const existingIntents = await this.intentRepository.findSeededSystemIntentsCount();
-    if (existingIntents === 0) {
+    const existingIntentsCount = await this.intentRepository.findSeededSystemIntentsCount();
+    if (existingIntentsCount === 0) {
       await this.createMany(seedSystemIntents);
     }
   }
@@ -57,5 +57,25 @@ export class IntentService {
     } catch (err) {
       throw new BadGatewayException(`SystemIntent with id ${id} not found.`);
     }
+  }
+
+  async findByIntent(intent: string): Promise<SystemIntent> {
+    try {
+      const systemIntent = await this.intentRepository.findByIntent({ intent });
+
+      if (!systemIntent) {
+        throw new NotFoundException(`SystemIntent with intent ${intent} not found.`);
+      }
+      return systemIntent;
+    } catch (err) {
+      throw new BadGatewayException(`SystemIntent with intent ${intent} not found.`);
+    }
+  }
+
+  // This service should call an LLM to properly classify the intents.
+  // This function only generates a random intent per message.
+  async classifyQueryToIntent(query: string): Promise<string[]> {
+    console.log(query);
+    return [];
   }
 }

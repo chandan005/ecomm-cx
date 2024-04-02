@@ -7,10 +7,10 @@ export class CreateMessageDto {
   @IsNotEmpty()
   @IsArray()
   @ValidateNested()
-  intentsIdentifier: string[];
+  intentsIdentified: string[];
 
-  @ApiProperty({ required: true })
+  @ApiProperty({ required: true, isArray: true })
   @IsNotEmpty()
   @IsObject()
-  queryAndResponse: QueryAndResponse;
+  queryAndResponses: QueryAndResponse[];
 }
