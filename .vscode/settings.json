@@ -27,5 +27,6 @@
     "**/bower_components": true,
     "**/tmp": true,
     "**/dist": true
-  }
+  },
+  "cSpell.words": ["ecommerce"]
 }
