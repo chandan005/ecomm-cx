@@ -1,6 +1,6 @@
 import { MessageChannel } from './MessageChannel.Type';
 
-export const systemIntents = [
+export const seedSystemIntents = [
   {
     intent: 'Request for Order Status',
     intentDescription:

@@ -17,11 +17,20 @@ export class IntentRepository {
     return this.findSystemIntent(createdIntent?.id);
   }
 
+  async createSystemIntents(systemIntents: Partial<SystemIntent>[]): Promise<void> {
+    const createdIntents = this.repository.create(systemIntents);
+    await this.repository.save(createdIntents);
+  }
+
   async findSystemIntent(id: number): Promise<Nullable<SystemIntent>> {
     return this.repository.createQueryBuilder('si').where('si.id = :id', { id }).getOne();
   }
 
   async findSystemIntents(): Promise<Nullable<SystemIntent[]>> {
     return this.repository.createQueryBuilder('si').getMany();
+  }
+
+  async findSeededSystemIntentsCount(): Promise<number> {
+    return this.repository.createQueryBuilder('si').getCount();
   }
 }
