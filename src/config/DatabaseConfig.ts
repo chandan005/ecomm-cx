@@ -13,5 +13,9 @@ export const DatabaseConfig = registerAs('database', () => {
     entities: [join(__dirname, '../**', '*.Entity.{ts,js}')],
     migrationsTableName: 'migrations',
     synchronize: process.env.DATABASE_SYNC,
+    migrations: [__dirname + '/config/migrations/*.ts'],
+    cli: {
+      migrationsDir: 'src/config/migrations',
+    },
   };
 });

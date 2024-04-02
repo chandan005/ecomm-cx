@@ -17,7 +17,7 @@
   },
   "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
-    "source.organizeImports": "explicit"
+    // "source.organizeImports": "always"
   },
   "prettier.configPath": ".prettierrc",
   "js/ts.implicitProjectConfig.experimentalDecorators": true,
