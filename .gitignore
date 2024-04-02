@@ -6,7 +6,6 @@
 .cache
 
 # ENV
-local.env
 dev.env
 prod.env
 
