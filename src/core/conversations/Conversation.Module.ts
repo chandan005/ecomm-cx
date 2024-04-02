@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConversationController } from './Conversation.Controller';
 import { ConversationRepository } from './Conversation.Repository';
 import { ConversationService } from './Conversation.Service';
-import { ConversationDIToken } from './ConverstionDIToken';
+import { ConversationDIToken } from './ConversationDIToken';
 
 @Module({
   imports: [ConversationDIToken.ConversationEntity, ConversationDIToken.MessageEntity],
