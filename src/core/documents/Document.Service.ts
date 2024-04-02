@@ -10,7 +10,7 @@ import { parse } from 'csv-parse';
 import { extname } from 'path';
 import { S3Service } from '../../infra/s3/S3.Service';
 import { Nullable } from '../../lib/types/Nullable';
-import { DOCUMENT_UPLOADED } from '../event-listener/EventListener.Service';
+// import { DOCUMENT_UPLOADED } from '../event-listener/EventListener.Service';
 import { DocumentRepository } from './Document.Repository';
 import { CreateDocumentDto } from './dto/CreateDocumentDto';
 import { GetPresignedUrlDto } from './dto/GetPresignedUrlDto';
@@ -38,7 +38,7 @@ export class DocumentService {
       }
 
       if (document.documentType === DocumentType.CsvMessage) {
-        this.eventEmitter.emitAsync(DOCUMENT_UPLOADED, document);
+        this.eventEmitter.emitAsync('document.uploaded', document);
       }
 
       return document;
@@ -78,7 +78,9 @@ export class DocumentService {
         file.buffer,
       );
 
-      return this.create({ fileName: file.originalname });
+      return this.create({
+        fileName: `${file.originalname}`,
+      });
     } catch (err) {
       throw new BadRequestException(err.message || 'Failed to upload CSV');
     }
@@ -97,7 +99,7 @@ export class DocumentService {
 
     try {
       const signedUrl = await this.s3Service.generateSignedUrl(
-        process.env.S3_DOCUMENTS_BUCKET_NAME || '',
+        process.env.S3_BUCKET_NAME || '',
         key,
         getPresignedUrlDto.operationType,
         getPresignedUrlDto.expirationTimeInSeconds,
@@ -118,7 +120,7 @@ export class DocumentService {
   }
 
   async validateCsv(bucket: string, key: string): Promise<CsvMessage[]> {
-    const chatbotMessages: CsvMessage[] = [];
+    const csvMessages: CsvMessage[] = [];
     const readableStream = await this.s3Service.getCsvStream(bucket, key);
 
     if (!readableStream) {
@@ -143,19 +145,19 @@ export class DocumentService {
       if (!record.sender_username || !record.message || !record.channel) {
         break;
       }
-      if (!Object.values(MessageChannel).includes(record['channel'])) {
-        break;
-      }
+      // if (!Object.values(MessageChannel).includes(record.channel)) {
+      //   break;
+      // }
 
-      const chatbotMessage: CsvMessage = {
+      const csvMessage: CsvMessage = {
         senderUserName: record.sender_username,
         receiverUserName: record.receiver_username,
         message: record.message,
         channel: record.channel,
       };
-      chatbotMessages.push(chatbotMessage);
+      csvMessages.push(csvMessage);
     }
-    return chatbotMessages;
+    return csvMessages;
   }
 
   validateHeaders(parsedHeaders: string[]): boolean {

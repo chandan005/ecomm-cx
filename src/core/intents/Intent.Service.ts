@@ -59,16 +59,16 @@ export class IntentService {
     }
   }
 
-  async findByIntent(intent: string): Promise<SystemIntent> {
+  async findByIntents(intents: string[]): Promise<SystemIntent[]> {
     try {
-      const systemIntent = await this.intentRepository.findByIntent({ intent });
+      const systemIntents = await this.intentRepository.findByIntents({ intents });
 
-      if (!systemIntent) {
-        throw new NotFoundException(`SystemIntent with intent ${intent} not found.`);
+      if (!systemIntents) {
+        throw new NotFoundException(`SystemIntent with intent ${intents} not found.`);
       }
-      return systemIntent;
+      return systemIntents;
     } catch (err) {
-      throw new BadGatewayException(`SystemIntent with intent ${intent} not found.`);
+      throw new BadGatewayException(`SystemIntent with intent ${intents} not found.`);
     }
   }
 
@@ -76,6 +76,7 @@ export class IntentService {
   // This function only generates a random intent per message.
   async classifyQueryToIntent(query: string): Promise<string[]> {
     console.log(query);
-    return [];
+
+    return ['Request for Click and Collect'];
   }
 }

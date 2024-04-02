@@ -23,7 +23,7 @@ function setupSwagger(app: INestApplication): void {
 
 function setupCors(app: INestApplication): void {
   const cors = {
-    origin: ['localhost:4200'],
+    origin: ['*'],
     credentials: true,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     allowedHeaders: ['Content-Type', 'Authorization'],

@@ -7,8 +7,7 @@ import { DocumentService } from '../documents/Document.Service';
 import { CsvMessage } from '../documents/entities/CsvMessage.Type';
 import { Document } from '../documents/entities/Document.Entity';
 import { IntentService } from '../intents/Intent.Service';
-
-export const DOCUMENT_UPLOADED = 'document.uploaded';
+import { SystemIntent } from '../intents/entities/SystemIntent.Entity';
 
 @Injectable()
 export class EventListenerService {
@@ -18,7 +17,7 @@ export class EventListenerService {
     private readonly conversationService: ConversationService,
   ) {}
 
-  @OnEvent(DOCUMENT_UPLOADED, { async: true })
+  @OnEvent('document.uploaded', { async: true })
   async onDocumentUploaded(document: Document) {
     const messages: CsvMessage[] = await this.documentService.validateCsv(
       process.env.S3_BUCKET_NAME ?? '',
@@ -36,9 +35,10 @@ export class EventListenerService {
       });
 
       const queryAndResponses: QueryAndResponse[] = [];
-      for (const intent of intentsIdentified) {
-        const systemIntent = await this.intentService.findByIntent(intent);
-
+      console.log('Intent Identified', intentsIdentified);
+      const systemIntents: SystemIntent[] =
+        await this.intentService.findByIntents(intentsIdentified);
+      for (const systemIntent of systemIntents) {
         const systemIntentResponses = systemIntent.responses.filter(
           (si) => si.channel === message.channel,
         );
